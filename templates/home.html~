@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <!doctype html>
 <html>
 
@@ -15,3 +16,10 @@
 
 </html>
 
+=======
+<html>
+  <body>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.16/socket.io.min.js"></script>
+  </body>
+</html>
+>>>>>>> aa7ad93709de0ea13f2163743b13401e4bb82328
