@@ -12,7 +12,7 @@ var shape = function Shape(x, y, w, h, fill) {
 
 Shape.prototype.draw = function(ctx) {
     ctx.fillStyle = this.fill;
-    ctx.fillRect(this.x, this.y, this.w, this.h);
+    actx.fillRect(this.x, this.y, this.w, this.h);
 }
 
 
