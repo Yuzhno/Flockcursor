@@ -1,22 +1,25 @@
 
+
 var c = document.getElementById("myCanvas");
 var ctx = c.getContext("2d");
 
-var shape = function Shape(x, y, w, h, fill) {
+function Shape(x, y, w, h, fill) {
     this.x = x || 0;
     this.y = y || 0;
     this.w = w || 1;
     this.h = h || 1;
     this.fill = fill || '#AAAAAA';
-}
+};
 
 Shape.prototype.draw = function(ctx) {
-    ctx.fillStyle = this.fill;
-    actx.fillRect(this.x, this.y, this.w, this.h);
-}
+    ctx.fillStyle = "#FF0000";
+    ctx.fillRect(100, 100, 100, 100);
+};
 
+ctx.fillStyle = "#FF0000";
+ctx.fillRect(0,0,150,75);
 
-$(document).ready(start);
+c.addShape(new Shape (100 , 100 ,100 ,100 , "#FF0000"));
 
 var start = function(){
     var socket = io.connect('http://' + document.domain + ':' + location.port);
@@ -25,4 +28,4 @@ var start = function(){
     });
     socket.emit('my event', {data: 'I\'m connected!'});
 
-}
+};
