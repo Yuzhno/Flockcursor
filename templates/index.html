@@ -71,18 +71,28 @@ cursor:none;
   <script type="text/javascript" charset="utf-8">
 var socket;
 
+var sanitize = function(message) {
+return message.replace('<', '#');
+}
+
 $(document).ready(function() {
+
+var canvas = new fabric.Canvas('main-area');
     socket = io.connect('http://' + document.domain + ':' + location.port);
+/* own_cursor = new fabric.Circle({ left : 0, top : 0, radius : 8, fill:'#f55',}); 
+canvas.add(own_cursor); */
 
     socket.on('connect', function() {
-	socket.emit('joined', {});
+var input = sanitize(prompt("Enter your nickname!", ""));
+	socket.emit('joined', {name : input});
     });
 
     $('#chat-prompt').keypress(function(e) {
         var code = e.keyCode || e.which;
         if (code == 13) {
-            text = $('#chat-prompt').val();
+            text = sanitize($('#chat-prompt').val());
             $('#chat-prompt').val('');
+	    $('#chat-prompt').scrollTop($('#chat-prompt')[0].scrollHeight);
             socket.emit('user_msg', {message: text});
         }
     });
@@ -90,18 +100,21 @@ $(document).ready(function() {
     $('#name').keypress(function(e) {
         var code = e.keyCode || e.which;
         if (code == 13) {
-            text = $('#name').val();
-            $('#text').val('');
+            text = sanitize($('#name').val());
+            $('#name').val('');
             socket.emit('change_name', {new: text});
         }
     });
 
     socket.on('msg', function(data) {
-	console.log(data);
 	var new_msg = document.createElement('p');
 	new_msg.innerHTML = data.message;
         $('#interface').append(new_msg);
     });
+
+   /* $('#main-area').mousemove(function(e) {
+
+    }); */
 });
 </script>
 </head>

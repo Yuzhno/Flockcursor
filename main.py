@@ -3,6 +3,12 @@ from flask import session, redirect, render_template
 
 from flask.ext.socketio import SocketIO, emit, join_room, leave_room
 
+class cursor:
+    def __init__(self, name):
+        self.coord = [0, 0]
+        self.name = name
+
+
 app = Flask(__name__)
 app.debug = True
 
@@ -10,15 +16,17 @@ socketio = SocketIO(app)
 room="test"
 app.config['SECRET_KEY'] = ':3'
 
+cursors = []
+
 @app.route('/')
 def interface():
-    session['name'] = 'anon'
     return render_template('index.html')
 
 @socketio.on('joined')
-def joined(message):
+def joined(name):
     join_room(room)
-    emit('msg', {'message' : "A user has joined!"}, room=room)
+    session['name'] = name['name']
+    emit('msg', {'message' : name['name'] + " has joined!"}, room=room)
 
 @socketio.on('user_msg')
 def user_msg(message):
