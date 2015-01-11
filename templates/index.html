@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Flockcursor</title>
+  <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.5.0/pure-min.css">
+  <style>
+* {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+a {
+    text-decoration: none;
+    color: rgb(61, 146, 201);
+}
+
+.sidebar {
+    background: rgb(61, 79, 93);
+    width: 250px;
+    position: fixed;
+    color: #fff;
+}
+
+p {
+    font-size:10px;
+}
+
+#interface {
+    overflow-y: scroll;
+    height: 30em;
+    width: 250px;
+}
+
+#main-area {
+cursor:none;
+}
+
+.footer {
+    text-align: center;
+    padding: 1em 0;
+}
+.footer a {
+    color: #ccc;
+    font-size: 80%;
+}
+
+@media (min-width: 48em) {
+    .content {
+        padding: 1em 1em 0;
+        margin-left: 15%;
+    }
+
+    .header {
+        margin: 8% 2em 0;
+        text-align: right;
+    }
+
+    .sidebar {
+        position: fixed;
+        top: 0;
+        bottom: 0;
+    }
+}
+</style>
+
+  <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
+  <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.16/socket.io.min.js"></script>
+  <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/fabric.js/1.4.13/fabric.min.js"></script>
+  <script type="text/javascript" charset="utf-8">
+var socket;
+
+$(document).ready(function() {
+    socket = io.connect('http://' + document.domain + ':' + location.port);
+
+    socket.on('connect', function() {
+	socket.emit('joined', {});
+    });
+
+    $('#chat-prompt').keypress(function(e) {
+        var code = e.keyCode || e.which;
+        if (code == 13) {
+            text = $('#chat-prompt').val();
+            $('#chat-prompt').val('');
+            socket.emit('user_msg', {message: text});
+        }
+    });
+
+    $('#name').keypress(function(e) {
+        var code = e.keyCode || e.which;
+        if (code == 13) {
+            text = $('#name').val();
+            $('#text').val('');
+            socket.emit('change_name', {new: text});
+        }
+    });
+
+    socket.on('msg', function(data) {
+	console.log(data);
+	var new_msg = document.createElement('p');
+	new_msg.innerHTML = data.message;
+        $('#interface').append(new_msg);
+    });
+});
+</script>
+</head>
+
+<body>
+  <div class="sidebar">
+    <div class="chat-room">
+      <div id="interface">
+      </div>
+      <textarea id="chat-prompt" placeholder="send a messange"></textarea>
+<input id="name" name="nick" placeholder="enter your nick here">
+    </div>
+  </div>
+
+  <div class="content main"><center>
+      <canvas id="main-area" width="1200" height="800"
+	      style="border:1px solid #000000;">
+      </canvas> </center>
+  </div>
+</body>
+</html>

@@ -1,0 +1,58 @@
+* {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+a {
+    text-decoration: none;
+    color: rgb(61, 146, 201);
+}
+
+.sidebar {
+    background: rgb(61, 79, 93);
+    width: 250px;
+    position: fixed;
+    color: #fff;
+}
+
+p {
+    font-size:10px;
+}
+
+#interface {
+    overflow-y: scroll;
+    height: 30em;
+    width: 250px;
+}
+
+#main-area {
+    cursor:none;
+}
+
+.footer {
+    text-align: center;
+    padding: 1em 0;
+}
+.footer a {
+    color: #ccc;
+    font-size: 80%;
+}
+
+@media (min-width: 48em) {
+    .content {
+        padding: 1em 1em 0;
+        margin-left: 15%;
+    }
+
+    .header {
+        margin: 8% 2em 0;
+        text-align: right;
+    }
+
+    .sidebar {
+        position: fixed;
+        top: 0;
+        bottom: 0;
+    }
+}
