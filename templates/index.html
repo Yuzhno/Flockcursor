@@ -72,7 +72,10 @@ cursor:none;
 var socket;
 
 var sanitize = function(message) {
-return message.replace('<', '#');
+  if( message != null)
+    return message.replace('<', '#');
+  else  
+    document.getElementById('chat-prompt').disabled = true;
 }
 
 $(document).ready(function() {
@@ -84,8 +87,8 @@ canvas.add(own_cursor); */
 
     socket.on('connect', function() {
 var input = sanitize(prompt("Enter your nickname!", ""));
-	socket.emit('joined', {name : input});
-    });
+   socket.emit('joined', {name : input});
+   });
 
     $('#chat-prompt').keypress(function(e) {
         var code = e.keyCode || e.which;

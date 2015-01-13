@@ -29,17 +29,17 @@ def joined(name):
     session['name'] = name['name']
     ctr.append(name['name'])
     emit('msg', {'message' : name['name'] + " has joined!", 'online' : len(ctr)}, room=room)
-
+    
 @socketio.on('user_msg')
 def user_msg(message):
     name = session['name']
-    emit('msg', {'message' : name + ': ' + message['message']}, room=room)
+    emit('msg', {'message' : name + ': ' + message['message'], 'online' : len(ctr)}, room=room)
 
 @socketio.on('change_name')
 def change_name(new):
     old = session['name']
     session['name'] = new['new']
-    emit('msg', {'message' : old + ' has changed their name to ' + new['new']}, room=room)
+    emit('msg', {'message' : old + ' has changed their name to ' + new['new'], 'online' : len(ctr)}, room=room)
 
 if __name__ == '__main__':
     socketio.run(app)
