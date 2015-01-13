@@ -1,4 +1,5 @@
 var socket;
+var number; var 
 
 $(document).ready(function() {
     socket = io.connect('http://' + document.domain + ':' + location.port);
@@ -30,5 +31,13 @@ $(document).ready(function() {
 	var new_msg = document.createElement('p');
 	new_msg.innerHTML = data.message;
         $('#interface').append(new_msg);
+    });
+    $('#main-area').mousemove(function(e) {
+	var x = e.clientX;
+ 	var y = e.clientY;
+	socket.emit('mousemove', {x : x , y : y});
+    });
+    socket.on('movemouse', function(x , y , user){
+	socket.emit('movemouse' , {x : x , y : y , user : user});
     });
 });

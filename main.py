@@ -16,8 +16,7 @@ socketio = SocketIO(app)
 room="test"
 app.config['SECRET_KEY'] = ':3'
 
-cursors = []
-ctr = []
+cursors = {}
 
 @app.route('/')
 def interface():
@@ -27,19 +26,25 @@ def interface():
 def joined(name):
     join_room(room)
     session['name'] = name['name']
-    ctr.append(name['name'])
-    emit('msg', {'message' : name['name'] + " has joined!", 'online' : len(ctr)}, room=room)
-    
+    cursors[name] = [0,0];
+    emit('msg', {'message' : name['name'] + " has joined!"}, room=room)
+
 @socketio.on('user_msg')
 def user_msg(message):
     name = session['name']
-    emit('msg', {'message' : name + ': ' + message['message'], 'online' : len(ctr)}, room=room)
+    emit('msg', {'message' : name + ': ' + message['message']}, room=room)
 
 @socketio.on('change_name')
 def change_name(new):
     old = session['name']
     session['name'] = new['new']
-    emit('msg', {'message' : old + ' has changed their name to ' + new['new'], 'online' : len(ctr)}, room=room)
+    emit('msg', {'message' : old + ' has changed their name to ' + new['new']}, room=room)
+
+@socketio.on('mousemove')
+def mousemove(x , y):
+    cursors[session['name']] = [x , y]
+    emit('movemouse' , {'x' : x , 'y' : y , user : session['name']})
+    
 
 if __name__ == '__main__':
     socketio.run(app)
