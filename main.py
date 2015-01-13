@@ -17,6 +17,7 @@ room="test"
 app.config['SECRET_KEY'] = ':3'
 
 cursors = []
+ctr = []
 
 @app.route('/')
 def interface():
@@ -26,7 +27,8 @@ def interface():
 def joined(name):
     join_room(room)
     session['name'] = name['name']
-    emit('msg', {'message' : name['name'] + " has joined!"}, room=room)
+    ctr.append(name['name'])
+    emit('msg', {'message' : name['name'] + " has joined!", 'online' : len(ctr)}, room=room)
 
 @socketio.on('user_msg')
 def user_msg(message):

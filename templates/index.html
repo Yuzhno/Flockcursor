@@ -110,6 +110,7 @@ var input = sanitize(prompt("Enter your nickname!", ""));
 	var new_msg = document.createElement('p');
 	new_msg.innerHTML = data.message;
         $('#interface').append(new_msg);
+	document.getElementById('online').innerHTML = data.online + " user(s) online.";
     });
 
    /* $('#main-area').mousemove(function(e) {
@@ -125,7 +126,8 @@ var input = sanitize(prompt("Enter your nickname!", ""));
       <div id="interface">
       </div>
       <textarea id="chat-prompt" placeholder="send a message"></textarea>
-<input id="name" name="nick" placeholder="enter your nick here">
+      <input id="name" name="nick" placeholder="enter your nick here">
+      <div id="online"></div>
     </div>
   </div>
 
