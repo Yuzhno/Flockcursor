@@ -31,6 +31,7 @@ def joined(name):
     global ctr
     ctr += 1
     emit('msg', {'message' : name['name'] + " has joined!"}, room=room)
+    return render_template('index.html',online=ctr)
 
 @socketio.on('user_msg')
 def user_msg(message):
