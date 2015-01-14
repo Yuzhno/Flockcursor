@@ -16,17 +16,20 @@ socketio = SocketIO(app)
 room="test"
 app.config['SECRET_KEY'] = ':3'
 
+ctr = 0
 cursors = {}
 
 @app.route('/')
 def interface():
-    return render_template('index.html')
+    return render_template('index.html', online=ctr)
 
 @socketio.on('joined')
 def joined(name):
     join_room(room)
     session['name'] = name['name']
-    cursors[name] = [0,0];
+    cursors['name'] = [0,0]
+    global ctr
+    ctr += 1
     emit('msg', {'message' : name['name'] + " has joined!"}, room=room)
 
 @socketio.on('user_msg')

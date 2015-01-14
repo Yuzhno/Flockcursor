@@ -77,7 +77,7 @@ var sanitize = function(message) {
   else  
     document.getElementById('chat-prompt').disabled = true;
 }
-
+	
 $(document).ready(function() {
 
 var canvas = new fabric.Canvas('main-area');
@@ -85,8 +85,10 @@ var canvas = new fabric.Canvas('main-area');
 /* own_cursor = new fabric.Circle({ left : 0, top : 0, radius : 8, fill:'#f55',}); 
 canvas.add(own_cursor); */
 
-    socket.on('connect', function() {
-var input = sanitize(prompt("Enter your nickname!", ""));
+
+
+socket.on('connect', function() {
+	var input = sanitize(prompt("Enter your nickname!", ""));
    socket.emit('joined', {name : input});
    });
 
@@ -113,7 +115,6 @@ var input = sanitize(prompt("Enter your nickname!", ""));
 	var new_msg = document.createElement('p');
 	new_msg.innerHTML = data.message;
         $('#interface').append(new_msg);
-	document.getElementById('online').innerHTML = data.online + " user(s) online.";
     });
 
    /* $('#main-area').mousemove(function(e) {
@@ -131,6 +132,7 @@ var input = sanitize(prompt("Enter your nickname!", ""));
       <textarea id="chat-prompt" placeholder="send a message"></textarea>
       <input id="name" name="nick" placeholder="enter your nick here">
       <div id="online"></div>
+      {{online}} user(s) online.
     </div>
   </div>
 
