@@ -80,9 +80,18 @@ $(document).ready(function() {
 
 var canvas = new fabric.Canvas('main-area');
     socket = io.connect('http://' + document.domain + ':' + location.port);
-/* own_cursor = new fabric.Circle({ left : 0, top : 0, radius : 8, fill:'#f55',}); 
-canvas.add(own_cursor); */
-
+own_cursor = new fabric.Circle({ left : 100, top : 100, radius : 60, fill:'#f55',}); 
+canvas.add(own_cursor);
+canvas.item(0).hasControls = canvas.item(0).hasBorders = false;
+canvas.item(0).lockMovementX = true;		
+canvas.item(0).lockMovementY = true;
+canvas.item(0).on({
+	'mouse:move': function(e) {
+		e.pageX = 500;
+		e.pageY = 500;
+		console.log('a');
+	} } );
+				
 /*when user joins they will have chat access*/
 socket.on('join', function() {
     document.getElementById('chat-prompt').disabled = false;
@@ -107,7 +116,8 @@ socket.on('connect', function() {
 
     /*when user types in nickname area*/
     $('#name').keypress(function(e) {
-        var code = e.keyCode || e.which;
+	console.log('a');
+	var code = e.keyCode || e.which;
         if (code == 13) {
             text = sanitize($('#name').val());
             $('#name').val('');
@@ -126,10 +136,15 @@ socket.on('connect', function() {
 	document.getElementById("online").innerHTML = data.online + " user(s) online";
 	}
     });
-
-   /* $('#main-area').mousemove(function(e) {
-
-    }); */
+    $('#main-area').mousemove(function(e) {
+	console.log('a');
+        var x = e.clientX;
+ 	var y = e.clientY;
+	socket.emit('mouse_move', {x : x , y : y});
+    });
+    socket.on('move_clientmouse', function(x , y , user){
+	console.log('a');
+    });
 });
 </script>
 </head>

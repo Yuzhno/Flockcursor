@@ -85,10 +85,10 @@ def change_name(new):
     else:
         joined( {'name' : new['new']} )
 
-@socketio.on('mousemove')
-def mousemove(x , y):
+@socketio.on('mouse_move')
+def mouse_move(x , y):
     cursors[session['name']] = [x , y]
-    emit('movemouse' , {'x' : x , 'y' : y , user : session['name']})
+    emit('move_clientmouse' , {'x' : x , 'y' : y , user : session['name']})
     
 
 if __name__ == '__main__':

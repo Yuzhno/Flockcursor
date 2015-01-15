@@ -38,6 +38,7 @@ $(document).ready(function() {
 	socket.emit('mousemove', {x : x , y : y});
     });
     socket.on('movemouse', function(x , y , user){
-	socket.emit('movemouse' , {x : x , y : y , user : user});
+	//socket.emit('mousemove' , {x : x , y : y , user : user});
+	console.log('a');
     });
 });
