@@ -23,34 +23,49 @@ cursors = {}
 def interface():
     return render_template('index.html', online=ctr)
 
+#user connects to page. announces user joining in chat
 @socketio.on('joined')
 def joined(name):
+    #joins if user submits a nickname
     join_room(room)
-    session['name'] = name['name']
-    cursors['name'] = [0,0]
-    global ctr
-    ctr += 1
-    emit('msg', {'message' : name['name'] + " has joined!", 'online' : ctr}, room=room)
+    if (name != {}):
+        session['name'] = name['name']
+        cursors['name'] = [0,0]
+        global ctr
+        ctr += 1
+        emit('msg', {'message' : name['name'] + " has joined!", 'online' : ctr}, room=room)
+        emit('join')
+    #else user can only see how many are on chat
+    else:
+        emit('msg', {'online' : ctr}, room=room)
 
-
-#Disconnect is slow; according to documentation takes a few seconds to register 
+#disconnect is slow; according to documentation takes a few seconds to register 
 @socketio.on('disconnect')
 def leave():
-    leave_room(room)
-    global ctr
-    ctr -= 1
-    emit('msg', {'message' : session['name'] + " has left!", 'online' : ctr} , room=room)
-
+#registers as a user leaving if user has 'logged into' chat
+    if ('name' in session):
+        leave_room(room)
+        global ctr
+        ctr -= 1
+        emit('msg', {'message' : session['name'] + " has left!", 'online' : ctr} , room=room)
+        
+#User chat-prompt. Sends message to js function -> prints message in chat
 @socketio.on('user_msg')
 def user_msg(message):
     name = session['name']
     emit('msg', {'message' : name + ': ' + message['message']}, room=room)
 
+#User chat-name. Sets new name. Sends message regarding change to js function
 @socketio.on('change_name')
 def change_name(new):
-    old = session['name']
-    session['name'] = new['new']
-    emit('msg', {'message' : old + ' has changed their name to ' + new['new']}, room=room)
+    #if user has a name already
+    if ('name' in session):
+        old = session['name']
+        session['name'] = new['new']
+        emit('msg', {'message' : old + ' has changed their name to ' + new['new']}, room=room)
+    #user has no name -> will get a name and have chat access
+    else:
+        joined( {'name' : new['new']} )
 
 @socketio.on('mousemove')
 def mousemove(x , y):
