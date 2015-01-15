@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, flash
 from flask import session, redirect, render_template
 
 from flask.ext.socketio import SocketIO, emit, join_room, leave_room
@@ -17,6 +17,7 @@ room="test"
 app.config['SECRET_KEY'] = ':3'
 
 ctr = 0
+users = []
 cursors = {}
 
 @app.route('/')
@@ -29,12 +30,19 @@ def joined(name):
     #joins if user submits a nickname
     join_room(room)
     if (name != {}):
-        session['name'] = name['name']
-        cursors['name'] = [0,0]
-        global ctr
-        ctr += 1
-        emit('msg', {'message' : name['name'] + " has joined!", 'online' : ctr}, room=room)
-        emit('join')
+
+        #no user repeats
+        if (name['name'] in users):
+            emit('msg', {'online' : ctr}, room=room)
+
+        else:
+            session['name'] = name['name']
+            cursors['name'] = [0,0]
+            global ctr
+            ctr += 1
+            users.append(name['name'])
+            emit('msg', {'message' : name['name'] + " has joined!", 'online' : ctr}, room=room)
+            emit('join')
     #else user can only see how many are on chat
     else:
         emit('msg', {'online' : ctr}, room=room)
@@ -47,6 +55,7 @@ def leave():
         leave_room(room)
         global ctr
         ctr -= 1
+        users.remove(session['name'])
         emit('msg', {'message' : session['name'] + " has left!", 'online' : ctr} , room=room)
         
 #User chat-prompt. Sends message to js function -> prints message in chat
@@ -60,9 +69,18 @@ def user_msg(message):
 def change_name(new):
     #if user has a name already
     if ('name' in session):
-        old = session['name']
-        session['name'] = new['new']
-        emit('msg', {'message' : old + ' has changed their name to ' + new['new']}, room=room)
+
+        #no user repeats
+        if (new['new'] in users):
+            emit('msg', {'online' : ctr}, room=room)
+            
+        else:
+            old = session['name']
+            users.remove(old)
+            session['name'] = new['new']
+            users.append(new['new'])
+            emit('msg', {'message' : old + ' has changed their name to ' + new['new']}, room=room)
+
     #user has no name -> will get a name and have chat access
     else:
         joined( {'name' : new['new']} )
