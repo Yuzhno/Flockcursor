@@ -29,6 +29,7 @@ def interface():
 def joined(name):
     #joins if user submits a nickname
     join_room(room)
+    global ctr
     if (name != {}):
 
         #no user repeats
@@ -38,7 +39,6 @@ def joined(name):
         else:
             session['name'] = name['name']
             cursors['name'] = [0,0]
-            global ctr
             ctr += 1
             users.append(name['name'])
             emit('msg', {'message' : name['name'] + " has joined!", 'online' : ctr}, room=room)
