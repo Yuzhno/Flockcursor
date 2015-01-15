@@ -33,16 +33,13 @@ def joined(name):
     emit('msg', {'message' : name['name'] + " has joined!", 'online' : ctr}, room=room)
 
 
-##testing    
+#Disconnect is slow; according to documentation takes a few seconds to register 
 @socketio.on('disconnect')
 def leave():
     leave_room(room)
-    print "Hello"
     global ctr
     ctr -= 1
-#    emit('msg', {'message' : name['name'] + " has joined!"}, room=room)
-#    return render_template('index.html',online=ctr)
-
+    emit('msg', {'message' : session['name'] + " has left!", 'online' : ctr} , room=room)
 
 @socketio.on('user_msg')
 def user_msg(message):
