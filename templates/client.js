@@ -1,5 +1,5 @@
 var socket;
-var number; var 
+var number; 
 
 $(document).ready(function() {
     socket = io.connect('http://' + document.domain + ':' + location.port);
