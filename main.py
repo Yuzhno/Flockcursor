@@ -86,10 +86,11 @@ def change_name(new):
         joined( {'name' : new['new']} )
 
 @socketio.on('mouse_move')
-def mouse_move(x , y):
+def mouse_move(coor):
+    x = coor['x']
+    y = coor['y']
     cursors[session['name']] = [x , y]
-    emit('move_clientmouse' , {'x' : x , 'y' : y , user : session['name']})
-    
+    emit('move_clientmouse' , {'x' : x , 'y' : y , 'user' : session['name']})
 
 if __name__ == '__main__':
     socketio.run(app)

@@ -4,64 +4,89 @@
   <meta charset="utf-8">
   <title>Flockcursor</title>
   <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.5.0/pure-min.css">
-  <style>
+  <style>  
 * {
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
 }
 
 a {
-    text-decoration: none;
-    color: rgb(61, 146, 201);
+	text-decoration: none;
+	color: rgb(61, 146, 201);
 }
 
 .sidebar {
-    background: rgb(61, 79, 93);
-    width: 250px;
-    position: fixed;
-    color: #fff;
+	background: rgb(61, 79, 93);
+	margin-left: 80%;
+	width: 20%;
+	height: 100%;
+	position: fixed;
+	color: #fff;
 }
 
 p {
-    font-size:10px;
+	font-size:10px;
 }
 
+/*canvas area*/
+.content-main {
+	position: fixed;
+	width: 80%;
+	height: 100%;
+	overflow: scroll;
+}
+
+/*chat box*/
 #interface {
-    overflow-y: scroll;
-    height: 30em;
-    width: 250px;
+	overflow-y: scroll;
+	overflow-x: hidden;
+	word-wrap: break-word;
+	background-color: black;
+	margin: 5%;
+	width: 90%;
+	height: 50%;
 }
 
-#main-area {
-cursor:none;
+#chat-prompt {
+	margin-left: 5%;
+	width: 90%;
+}
+
+#name {
+	margin-left: 5%;
+	width: 90%;
+}
+
+#online {
+	margin-left: 5%;
 }
 
 .footer {
-    text-align: center;
-    padding: 1em 0;
+	text-align: center;
+	padding: 1em 0;
 }
 .footer a {
-    color: #ccc;
-    font-size: 80%;
+	color: #ccc;
+	font-size: 80%;
 }
 
 @media (min-width: 48em) {
-    .content {
-        padding: 1em 1em 0;
-        margin-left: 15%;
-    }
+	.content {
+		padding: 1em 1em 0;
+		margin-left: 15%;
+	}
 
-    .header {
-        margin: 8% 2em 0;
-        text-align: right;
-    }
+	.header {
+		margin: 8% 2em 0;
+		text-align: right;
+	}
 
-    .sidebar {
-        position: fixed;
-        top: 0;
-        bottom: 0;
-    }
+	.sidebar {
+		position: fixed;
+		top: 0;
+		bottom: 0;
+	}
 }
 </style>
 
@@ -73,13 +98,13 @@ var socket;
 
 var sanitize = function(message) {
   if( message != null)
-    return message.replace('<', '#');
+	return message.replace('<', '#');
 }
 	
 $(document).ready(function() {
 
 var canvas = new fabric.Canvas('main-area');
-    socket = io.connect('http://' + document.domain + ':' + location.port);
+	socket = io.connect('http://' + document.domain + ':' + location.port);
 own_cursor = new fabric.Circle({ left : 100, top : 100, radius : 60, fill:'#f55',}); 
 other_cursor = new fabric.Circle({ left : 500, top : 500, radius : 10, fill:'#f55',}); 
 canvas.add(own_cursor);
@@ -96,7 +121,7 @@ canvas.item(0).on({
 				
 /*when user joins they will have chat access*/
 socket.on('join', function() {
-    document.getElementById('chat-prompt').disabled = false;
+	document.getElementById('chat-prompt').disabled = false;
 });
 
 /*user gets a chat name. triggers 'joined' python function*/
@@ -105,71 +130,70 @@ socket.on('connect', function() {
    socket.emit('joined', {name : input});
    });
 
-    /*when user types in chat*/
-    $('#chat-prompt').keypress(function(e) {
-        var code = e.keyCode || e.which;
+	/*when user types in chat*/
+	$('#chat-prompt').keypress(function(e) {
+		var code = e.keyCode || e.which;
 	if (code == 13) {
-            text = sanitize($('#chat-prompt').val());
-            $('#chat-prompt').val('');
-	    $('#chat-prompt').scrollTop($('#chat-prompt')[0].scrollHeight);
-            socket.emit('user_msg', {message: text});
-        }
-    });
+			text = sanitize($('#chat-prompt').val());
+			$('#chat-prompt').val('');
+		$('#chat-prompt').scrollTop($('#chat-prompt')[0].scrollHeight);
+			socket.emit('user_msg', {message: text});
+		}
+	});
 
-    /*when user types in nickname area*/
-    $('#name').keypress(function(e) {
+	/*when user types in nickname area*/
+	$('#name').keypress(function(e) {
 	var code = e.keyCode || e.which;
-        if (code == 13) {
-            text = sanitize($('#name').val());
-            $('#name').val('');
-            socket.emit('change_name', {new: text});
-        }
-    });
+		if (code == 13) {
+			text = sanitize($('#name').val());
+			$('#name').val('');
+			socket.emit('change_name', {new: text});
+		}
+	});
 
-    /*updates chat and users online*/
-    socket.on('msg', function(data) {
+	/*updates chat and users online*/
+	socket.on('msg', function(data) {
 	var new_msg = document.createElement('p');
 	if (data.message != undefined) {
 	new_msg.innerHTML = data.message;
-        $('#interface').append(new_msg);
+		$('#interface').append(new_msg);
 	}
 	if (data.online != undefined) {
 	document.getElementById("online").innerHTML = data.online + " user(s) online";
 	}
-    });
-    $('canvas').mousemove(function(e) {
+	});
+	$('canvas').mousemove(function(e) {
 	console.log('a');
-        var x = e.pageX;
- 	var y = e.pageY;
+		var x = e.pageX;
+	var y = e.pageY;
 	canvas.item(1).set('left' , x);
 	canvas.item(1).set('top' , y);
 	canvas.renderAll();
 	console.log(x);				
 	console.log(y);
 	socket.emit('mouse_move', {x : x , y : y});
-    });
-    socket.on('move_clientmouse', function(x , y , user){
+	});
+	socket.on('move_clientmouse', function(x , y , user){
 	console.log('a');
-    });
+	});
 });
 </script>
 </head>
 
-<body>
-  <div class="sidebar">
-    <div class="chat-room">
-      <div id="interface">
-      </div>
-      <textarea id="chat-prompt" placeholder="send a message" disabled="true"></textarea>
-      <input id="name" name="nick" placeholder="enter your nick here">
-      <div id="online"></div>
-    </div>
-  </div>
+<body style="overflow: hidden;">
+	<div class="sidebar" style="height: 100%;">
+		<div class="chat-room" style="height: 100%;">
+			<div id="interface"></div>
+			<textarea id="chat-prompt" placeholder="send a message" disabled="true"></textarea>
+			<input id="name" name="nick" placeholder="enter your nick here">
+			<div id="online"></div>
+		</div>
+	</div>
 
-  <div class="content main"><center>
-      <canvas id="main-area" width="1200" height="800"
-	      style="border:1px solid #000000;">
-      </canvas> </center>
-  </div>
+	<div class="content-main"><center>
+		<canvas id="main-area" width="1200" height="800"
+			style="border:1px solid #000000;">
+		</canvas> </center>
+	</div>
 </body>
 </html>
