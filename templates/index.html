@@ -135,8 +135,8 @@ socket.on('connect', function() {
 		var code = e.keyCode || e.which;
 	if (code == 13) {
 			text = sanitize($('#chat-prompt').val());
-			$('#chat-prompt').val('');
-		$('#chat-prompt').scrollTop($('#chat-prompt')[0].scrollHeight);
+			$('#chat-prompt').val('')
+
 			socket.emit('user_msg', {message: text});
 		}
 	});
@@ -161,20 +161,25 @@ socket.on('connect', function() {
 	if (data.online != undefined) {
 	document.getElementById("online").innerHTML = data.online + " user(s) online";
 	}
+	
+	/*Auto Scroll*/
+	$('#interface').scrollTop($('#interface')[0].scrollHeight);
+
 	});
+
 	$('canvas').mousemove(function(e) {
-	console.log('a');
+/*	console.log('a');*/
 		var x = e.pageX;
 	var y = e.pageY;
 	canvas.item(1).set('left' , x);
 	canvas.item(1).set('top' , y);
 	canvas.renderAll();
-	console.log(x);				
-	console.log(y);
+/*	console.log(x);				*/
+/*	console.log(y);*/
 	socket.emit('mouse_move', {x : x , y : y});
 	});
 	socket.on('move_clientmouse', function(x , y , user){
-	console.log('a');
+/*	console.log('a');*/
 	});
 });
 </script>
