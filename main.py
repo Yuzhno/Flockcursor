@@ -3,12 +3,6 @@ from flask import session, redirect, render_template
 
 from flask.ext.socketio import SocketIO, emit, join_room, leave_room
 
-class cursor:
-    def __init__(self, name):
-        self.coord = [0, 0]
-        self.name = name
-
-
 app = Flask(__name__)
 app.debug = True
 
@@ -17,7 +11,6 @@ room="test"
 app.config['SECRET_KEY'] = ':3'
 
 ctr = 0
-users = []
 cursors = {}
 
 @app.route('/')
@@ -31,18 +24,16 @@ def joined(name):
     join_room(room)
     global ctr
     if (name != {}):
-
         #no user repeats
-        if (name['name'] in users):
+        if (name['name'] in cursors.keys()):
             emit('msg', {'online' : ctr}, room=room)
-
         else:
             session['name'] = name['name']
-            cursors['name'] = [0,0]
+            cursors[name['name']] = [0,0]
             ctr += 1
-            users.append(name['name'])
             emit('msg', {'message' : name['name'] + " has joined!", 'online' : ctr}, room=room)
             emit('join')
+            emit('draw_all', {'players' : cursors}, room=room)
     #else user can only see how many are on chat
     else:
         emit('msg', {'online' : ctr}, room=room)
@@ -51,11 +42,11 @@ def joined(name):
 @socketio.on('disconnect')
 def leave():
 #registers as a user leaving if user has 'logged into' chat
-    if ('name' in session):
+    if 'name' in session:
+        emit('remove', {'user' : session['name']})
         leave_room(room)
         global ctr
         ctr -= 1
-        users.remove(session['name'])
         emit('msg', {'message' : session['name'] + " has left!", 'online' : ctr} , room=room)
         
 #User chat-prompt. Sends message to js function -> prints message in chat
@@ -87,10 +78,9 @@ def change_name(new):
 
 @socketio.on('mouse_move')
 def mouse_move(coor):
-    x = coor['x']
-    y = coor['y']
-    cursors[session['name']] = [x , y]
-    emit('move_clientmouse' , {'x' : x , 'y' : y , 'user' : session['name']})
+    if 'name' in session:
+        cursors[session['name']] = [coor['top'], coor['left']]
+        emit('move_clientmouse' , {'x' : cursors[session['name']][0], 'y' : cursors[session['name']][1], 'user' : session['name']})
 
 if __name__ == '__main__':
     socketio.run(app)
