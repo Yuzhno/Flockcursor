@@ -183,9 +183,11 @@ $(document).ready(function() {
 	socket.emit('mouse_move', {top : x , left : y});
     });
 
-    socket.on('move_clientmouse', function(x, y, user){
-	cursors[user].set('left' , x);
-	cursors[user].set('top' , y);
+    socket.on('move_clientmouse', function(e){
+        console.log(e.user);
+	cursors[e.user].set('left' , e.x);
+	cursors[e.user].set('top' , e.y);
+	console.log(e.user);			    
 	canvas.renderAll();
     });
 });
