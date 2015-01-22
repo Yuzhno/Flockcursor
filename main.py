@@ -43,7 +43,7 @@ def joined(name):
 def leave():
 #registers as a user leaving if user has 'logged into' chat
     if 'name' in session:
-        emit('remove', {'user' : session['name']})
+        emit('remove', {'user' : session['name']}, room=room)
         leave_room(room)
         global ctr
         ctr -= 1
@@ -62,14 +62,17 @@ def change_name(new):
     if ('name' in session):
 
         #no user repeats
-        if (new['new'] in users):
+        if (new['new'] in cursors.keys()):
             emit('msg', {'online' : ctr}, room=room)
             
         else:
             old = session['name']
-            users.remove(old)
+            coord = cursors[old]
+            del cursors[old]
             session['name'] = new['new']
-            users.append(new['new'])
+            cursors[session['name']] = coord
+            emit('remove', {'user' : old }, room=room)
+            emit('draw_one', {'user' : new['new'], 'coord' : coord }, room=room)
             emit('msg', {'message' : old + ' has changed their name to ' + new['new']}, room=room)
 
     #user has no name -> will get a name and have chat access
@@ -80,7 +83,7 @@ def change_name(new):
 def mouse_move(coor):
     if 'name' in session:
         cursors[session['name']] = [coor['top'], coor['left']]
-        emit('move_clientmouse' , {'x' : cursors[session['name']][0], 'y' : cursors[session['name']][1], 'user' : session['name']})
+        emit('move_clientmouse' , {'x' : cursors[session['name']][0], 'y' : cursors[session['name']][1], 'user' : session['name']}, room=room)
 
 if __name__ == '__main__':
     socketio.run(app)

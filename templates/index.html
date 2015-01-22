@@ -96,9 +96,14 @@ p {
   <script type="text/javascript" charset="utf-8">
 var socket;
 
+String.prototype.replaceAll = function(str1, str2, ignore) 
+{
+    return this.replace(new RegExp(str1.replace(/([\/\,\!\\\^\$\{\}\[\]\(\)\.\*\+\?\|\<\>\-\&])/g,"\\$&"),(ignore?"gi":"g")),(typeof(str2)=="string")?str2.replace(/\$/g,"$$$$"):str2);
+} 
+
 var sanitize = function(message) {
     if(message != null)
-	return message.replace('<', '#');
+	return message.replaceAll('<', '#');
 }
 
 $(document).ready(function() {
@@ -121,22 +126,44 @@ $(document).ready(function() {
 
     socket.on('draw_all', function(e) {
 	for (var key in e.players){
-	    cursors[key] = new fabric.Group(
-		[new fabric.Circle({ radius : 10, 
-				     fill:'#f55'}),
-		 new fabric.Text(key, { fontSize: 10,
-					originX: 'center',
-					originY: 'center'})],
-				    { left : e.players[key][0], top : e.players[key][1] });
-	    cursors[key].lockMovementX = cursors[key].lockMovementY = true;
-	    cursors[key].lockRotation = true;
-	    cursors[key].lockScalingX = cursors[key].lockScalingY = true;
-	    cursors[key].hasBorders = cursors[key].hasControls = false;		    
-	    canvas.add(cursors[key]);
+	    if (cursors[key] == undefined){
+		cursors[key] = new fabric.Group(
+		    [new fabric.Circle({ radius : 10, 
+					 fill:'#f55',
+					 originX: 'center',
+					 originY: 'center'}),
+		     new fabric.Text(key, { fontSize: 10,
+					    originX: 'center',
+					    originY: 'center'})],
+		    { left : e.players[key][0], top : e.players[key][1] });
+		cursors[key].lockMovementX = cursors[key].lockMovementY = true;
+		cursors[key].lockRotation = true;
+		cursors[key].lockScalingX = cursors[key].lockScalingY = true;
+		cursors[key].hasBorders = cursors[key].hasControls = false;		    
+		canvas.add(cursors[key]);
+	    }
 	}
     });
 
+    socket.on('draw_one', function(e) {
+	cursors[e.user] = new fabric.Group(
+	    [new fabric.Circle({ radius : 10, 
+				 fill:'#f55',
+				 originX: 'center',
+				 originY: 'center'}),
+	     new fabric.Text(e.user, { fontSize: 10,
+				       originX: 'center',
+				       originY: 'center'})],
+	    { left : e.coord[0], top : e.coord[1] });
+	cursors[e.user].lockMovementX = cursors[e.user].lockMovementY = true;
+	cursors[e.user].lockRotation = true;
+	cursors[e.user].lockScalingX = cursors[e.user].lockScalingY = true;
+	cursors[e.user].hasBorders = cursors[e.user].hasControls = false;		    
+	canvas.add(cursors[e.user]);
+    });
+
     socket.on('remove', function(e) {
+	canvas.remove(cursors[e.user]);
 	delete cursors[e.user];
 	canvas.renderAll();
     });
@@ -177,17 +204,19 @@ $(document).ready(function() {
 
     });
 
+    var mouse_last_move = 0;
     $('canvas').mousemove(function(e) {
-	x = e.pageX;
-	y = e.pageY;
-	socket.emit('mouse_move', {top : x , left : y});
+	if(Date.now() - mouse_last_move > 20){
+	    x = e.pageX;
+	    y = e.pageY;
+	    socket.emit('mouse_move', {top : x , left : y});
+	    mouse_last_move = Date.now();
+	}
     });
 
     socket.on('move_clientmouse', function(e){
-        console.log(e.user);
 	cursors[e.user].set('left' , e.x);
-	cursors[e.user].set('top' , e.y);
-	console.log(e.user);			    
+	cursors[e.user].set('top' , e.y);			    
 	canvas.renderAll();
     });
 });
