@@ -127,7 +127,11 @@ $(document).ready(function() {
 		 new fabric.Text(key, { fontSize: 10,
 					originX: 'center',
 					originY: 'center'})],
-		{ left : e.players[key][0], top : e.players[key][1] });
+				    { left : e.players[key][0], top : e.players[key][1] });
+	    cursors[key].lockMovementX = cursors[key].lockMovementY = true;
+	    cursors[key].lockRotation = true;
+	    cursors[key].lockScalingX = cursors[key].lockScalingY = true;
+	    cursors[key].hasBorders = cursors[key].hasControls = false;		    
 	    canvas.add(cursors[key]);
 	}
     });
