@@ -3,6 +3,9 @@ from flask import session, redirect, render_template
 
 from flask.ext.socketio import SocketIO, emit, join_room, leave_room
 
+import re
+from image_search import get_random_url, get_google_search
+
 app = Flask(__name__)
 app.debug = True
 
@@ -44,27 +47,31 @@ def leave():
 #registers as a user leaving if user has 'logged into' chat
     if 'name' in session:
         emit('remove', {'user' : session['name']}, room=room)
-        leave_room(room)
         global ctr
         ctr -= 1
         emit('msg', {'message' : session['name'] + " has left!", 'online' : ctr} , room=room)
+        leave_room(room)
         
 #User chat-prompt. Sends message to js function -> prints message in chat
 @socketio.on('user_msg')
 def user_msg(message):
+    reg = re.search('(?<=^!summon )[\w ]+', message['message'])
     name = session['name']
-    emit('msg', {'message' : name + ': ' + message['message']}, room=room)
+    if (reg != None):
+        fix = reg.group(0).replace(" ", "%20")
+        emit('render_image', {'url' : get_random_url(get_google_search(fix))}, room=room)
+        emit('msg', {'message' : name + ' is summoning a ' + reg.group(0) + '!'}, room=room)
+    else:
+        emit('msg', {'message' : name + ': ' + message['message']}, room=room)
 
 #User chat-name. Sets new name. Sends message regarding change to js function
 @socketio.on('change_name')
 def change_name(new):
     #if user has a name already
     if ('name' in session):
-
         #no user repeats
         if (new['new'] in cursors.keys()):
-            emit('msg', {'online' : ctr}, room=room)
-            
+            emit('msg', {'online' : ctr}, room=room)            
         else:
             old = session['name']
             coord = cursors[old]

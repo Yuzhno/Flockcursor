@@ -106,11 +106,18 @@ var sanitize = function(message) {
 	return message.replaceAll('<', '#');
 }
 
+var remove_white = new fabric.Image.filters.RemoveWhite({
+  threshold: 20,
+  distance: 140
+});
+
 $(document).ready(function() {
     
     var cursors = new Object(); 
+    var images = new Object(); 
 
     var canvas = new fabric.Canvas('main-area');
+   // var image_canvas = new fabric.Canvas('main-area');
     socket = io.connect('http://' + document.domain + ':' + location.port);
 
     /*when user joins they will have chat access*/
@@ -219,6 +226,15 @@ $(document).ready(function() {
 	cursors[e.user].set('top' , e.y);			    
 	canvas.renderAll();
     });
+
+    socket.on('render_image', function(e){
+	fabric.Image.fromURL(e.url, function(img) {
+	img.scale(1.0).set({
+	left: 10,
+	top : 10 });
+	canvas.renderAll();
+	});
+	});
 });
 
 </script>
