@@ -30,7 +30,10 @@ def joined(name):
         #no user repeats
         if (name['name'] in cursors.keys()):
             emit('msg', {'online' : ctr}, room=room)
-            emit('diffname')
+            if ('name' in session):
+                emit('diffname', {'name':session['name']})
+            else:
+                emit('diffname')
         else:
             session['name'] = name['name']
             cursors[name['name']] = [0,0]
@@ -73,7 +76,8 @@ def change_name(new):
         #no user repeats
         if (new['new'] in cursors.keys()):
             emit('msg', {'online' : ctr}, room=room)
-            emit('diffname')            
+            print session
+            emit('diffname', {'name':session['name']})            
         else:
             old = session['name']
             coord = cursors[old]

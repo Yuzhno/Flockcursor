@@ -159,7 +159,7 @@ $(document).ready(function() {
 				 originX: 'center',
 				 originY: 'center'}),
 	     new fabric.Text(e.user, { fontSize: 10,
-				       originX: 'center',
+ 				       originX: 'center',
 				       originY: 'center'})],
 	    { left : e.coord[0], top : e.coord[1] });
 	cursors[e.user].lockMovementX = cursors[e.user].lockMovementY = true;
@@ -177,7 +177,10 @@ $(document).ready(function() {
 
     socket.on('diffname', function(e) {
     sanitize(alert("This username is taken. Please select a new one."));
-    var input = sanitize(prompt("Enter your nickname!", ""));
+console.log(e);
+    if (e == undefined) {
+	var input = sanitize(prompt("Enter your nickname!", ""));
+}
 	socket.emit('joined', {name : input});
     });
 
