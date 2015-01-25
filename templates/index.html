@@ -1,10 +1,6 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <title>Flockcursor</title>
-  <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.5.0/pure-min.css">
-  <style>  
+{%extends 'base.html'%}
+
+{%block style%}
 * {
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
@@ -33,7 +29,7 @@ p {
 .content-main {
 	position: fixed;
 	width: 80%;
-	height: 100%;
+	height: 95%;
 	overflow: scroll;
 }
 
@@ -88,11 +84,10 @@ p {
 		bottom: 0;
 	}
 }
+{%endblock style%}
 </style>
 
-  <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
-  <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.16/socket.io.min.js"></script>
-  <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/fabric.js/1.4.13/fabric.min.js"></script>
+{%block script%}
   <script type="text/javascript" charset="utf-8">
 var socket;
 
@@ -225,7 +220,7 @@ $(document).ready(function() {
 	if(Date.now() - mouse_last_move > 20){
 	    x = e.pageX;
 	    y = e.pageY;
-	    socket.emit('mouse_move', {top : x+$('.content-main').scrollLeft() , left : y+$('.content-main').scrollTop()});
+	    socket.emit('mouse_move', {top : x+$('.content-main').scrollLeft() , left : y-24+$('.content-main').scrollTop()});
 	    mouse_last_move = Date.now();
 	}
     });
@@ -245,24 +240,24 @@ $(document).ready(function() {
 	});
 	});
 });
+  </script>
+{%endblock script%}
 
-</script>
-</head>
+{%block body%}
+<body style="overflow:hidden height:100%;">
+  <div class="sidebar" style="height:100%;">
+    <div class="chat-room" style="height:100%;">
+      <div id="interface"></div>
+      <textarea id="chat-prompt" placeholder="send a message" disabled="true"></textarea>
+      <input id="name" name="nick" placeholder="enter your nick here">
+      <div id="online"></div>
+    </div>
+  </div>
 
-<body style="overflow: hidden;">
-	<div class="sidebar" style="height: 100%;">
-		<div class="chat-room" style="height: 100%;">
-			<div id="interface"></div>
-			<textarea id="chat-prompt" placeholder="send a message" disabled="true"></textarea>
-			<input id="name" name="nick" placeholder="enter your nick here">
-			<div id="online"></div>
-		</div>
-	</div>
-
-	<div class="content-main"><center>
-		<canvas id="main-area" width="1200" height="800"
-			style="border:1px solid #000000;">
-		</canvas> </center>
-	</div>
+  <div class="content-main"><center>
+      <canvas id="main-area" width="1200" height="800"
+	      style="border:1px solid #000000;">
+    </canvas> </center>
+  </div>
 </body>
-</html>
+{%endblock body%}
