@@ -175,6 +175,12 @@ $(document).ready(function() {
 	canvas.renderAll();
     });
 
+    socket.on('diffname', function(e) {
+    sanitize(alert("This username is taken. Please select a new one."));
+    var input = sanitize(prompt("Enter your nickname!", ""));
+	socket.emit('joined', {name : input});
+    });
+
     /*when user types in chat*/
     $('#chat-prompt').keypress(function(e) {
 	var code = e.keyCode || e.which;
