@@ -44,13 +44,14 @@ def joined(name):
     #else user can only see how many are on chat
     else:
         emit('msg', {'online' : ctr}, room=room)
-
+    
 #disconnect is slow; according to documentation takes a few seconds to register 
 @socketio.on('disconnect')
 def leave():
 #registers as a user leaving if user has 'logged into' chat
     if 'name' in session:
         emit('remove', {'user' : session['name']}, room=room)
+        del(cursors[session['name']])
         global ctr
         ctr -= 1
         emit('msg', {'message' : session['name'] + " has left!", 'online' : ctr} , room=room)
@@ -76,7 +77,6 @@ def change_name(new):
         #no user repeats
         if (new['new'] in cursors.keys()):
             emit('msg', {'online' : ctr}, room=room)
-            print session
             emit('diffname', {'name':session['name']})            
         else:
             old = session['name']

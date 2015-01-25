@@ -128,6 +128,7 @@ $(document).ready(function() {
     /*user gets a chat name. triggers 'joined' python function*/
     socket.on('connect', function() {
 	var input = sanitize(prompt("Enter your nickname!", ""));
+	console.log(cursors)
 	socket.emit('joined', {name : input});
     });
 
@@ -177,7 +178,6 @@ $(document).ready(function() {
 
     socket.on('diffname', function(e) {
     sanitize(alert("This username is taken. Please select a new one."));
-console.log(e);
     if (e == undefined) {
 	var input = sanitize(prompt("Enter your nickname!", ""));
 }
@@ -225,7 +225,7 @@ console.log(e);
 	if(Date.now() - mouse_last_move > 20){
 	    x = e.pageX;
 	    y = e.pageY;
-	    socket.emit('mouse_move', {top : x , left : y});
+	    socket.emit('mouse_move', {top : x+$('.content-main').scrollLeft() , left : y+$('.content-main').scrollTop()});
 	    mouse_last_move = Date.now();
 	}
     });
