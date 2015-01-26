@@ -305,6 +305,8 @@ img['name'] = e.url;
 	});
     });
 
+	var screens = {};
+
 	$('#save').click(function() {
 	d = new Date();
 	var img = new Image();
@@ -313,10 +315,15 @@ img['name'] = e.url;
 	
 /*Screenshot dictionary, contains date and image url*/
 	screens[d] = img.src;
+	socket.emit("save", screens);
+});
+	
+	socket.on('post', function(scr) {
 	if(typeof(Storage)!=="undefined"){
-	    localStorage.setItem('images',JSON.stringify(screens));
-	    console.log(screens);
+         	localStorage.setItem('images',JSON.stringify(scr));
+	        console.log(scr);
 	}
+	
 	});
 });
 
