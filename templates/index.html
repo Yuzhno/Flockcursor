@@ -90,7 +90,7 @@ p {
 {%block script%}
   <script type="text/javascript" charset="utf-8">
 var socket;
-var screens = {}
+
 
 String.prototype.replaceAll = function(str1, str2, ignore) 
 {
@@ -119,18 +119,12 @@ $(document).ready(function() {
 	
     var cursors = new Object(); 
     var images = new Object(); 
-var selected = '';
+    var selected = '';
     var screens = {};
 
     var canvas = new fabric.Canvas('main-area');
     // var image_canvas = new fabric.Canvas('main-area');
     socket = io.connect('http://' + document.domain + ':' + location.port);
-	console.log(socket);
-	if(typeof(Storage)!=="undefined")
-	{
-	
-	localStorage.setItem('socket',socket);
-	}
 
 	
     /*when user joins they will have chat access*/
@@ -313,24 +307,16 @@ img['name'] = e.url;
 
 	$('#save').click(function() {
 	d = new Date();
-	d1 = new Date();
 	var img = new Image();
 	img.crossOrigin = 'Anonymous';
 	img.src = canvas.toDataURL(d.toUTCString()+"/png");
-	screen['img']=img.src;
-	console.log(screen['img']);
-	$('#content-main').append("<img src='"+img.src+"'\>");
 	
 /*Screenshot dictionary, contains date and image url*/
-	screens[d] = screen['img'];
-	if(typeof(Storage)!=="undefined")
-	{
-	localStorage.setItem('images',JSON.stringify(screens));
-	console.log(screens);
-
+	screens[d] = img.src;
+	if(typeof(Storage)!=="undefined"){
+	    localStorage.setItem('images',JSON.stringify(screens));
+	    console.log(screens);
 	}
-
- 	socket.emit('save_img',screens);
 	});
 });
 
