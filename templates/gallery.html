@@ -1,0 +1,36 @@
+{%extends 'base.html'%}
+{%block body%}
+<script type="text/javascript" charset="utf-8">
+
+  if(typeof(Storage)!=="undefined")
+  {
+  console.log(localStorage);
+  var socket = localStorage.getItem('socket');
+  console.log(socket);
+  }
+  
+  console.log("help");
+  var list = document.createElement('li');
+  var img = document.createElement('img');
+  img.src = src['src'];
+  list.innerHTML=img;
+  $('#gallery').append(img);
+
+  $(document).ready(function() {
+
+
+
+  if(typeof(Storage)!=="undefined")
+  {
+  console.log(JSON.parse(localStorage.getItem('images')));
+  
+  }
+  console.log("hello");
+  
+});  
+</script>
+<body>
+  <ul id='gallery'>
+  </ul>
+</body>
+{%endblock body%}
