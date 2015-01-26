@@ -98,5 +98,21 @@ def mouse_move(coor):
         cursors[session['name']] = [coor['top'], coor['left']]
         emit('move_clientmouse' , {'x' : cursors[session['name']][0], 'y' : cursors[session['name']][1], 'user' : session['name']}, room=room)
 
+@socketio.on('obj_scale')
+def obj_scale(scale):
+    emit('other_obj_scale', {'x' : scale['x'], 'y' : scale['y'], 'url' : scale['name']}, room=room)
+
+@socketio.on('obj_rotate')
+def obj_rotate(angle):
+    emit('other_obj_rotate', {'angle' : angle['angle'], 'url' : angle['name']}, room=room)
+
+@socketio.on('obj_move')
+def obj_move(coord):
+    emit('other_obj_move', {'x' : coord['x'], 'y' : coord['y'], 'url' : coord['name']}, room=room)
+
+@socketio.on('top_layer')
+def top_layer(img):
+    emit({'url' : img['name']}, room=room)
+
 if __name__ == '__main__':
     socketio.run(app)
