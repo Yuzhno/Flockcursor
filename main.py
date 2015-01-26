@@ -30,10 +30,7 @@ def joined(name):
         #no user repeats
         if (name['name'] in cursors.keys()):
             emit('msg', {'online' : ctr}, room=room)
-            if ('name' in session):
-                emit('diffname', {'name':session['name']})
-            else:
-                emit('diffname')
+            emit('diffname', {'name':name['name']})
         else:
             session['name'] = name['name']
             cursors[name['name']] = [0,0]
@@ -64,7 +61,7 @@ def user_msg(message):
     name = session['name']
     if (reg != None):
         fix = reg.group(0).replace(" ", "%20")
-        emit('render_image', {'url' : get_random_url(get_google_search(fix))}, room=room)
+        emit('render_image', {'url' : get_random_url(get_google_search(fix)), 'message' : message}, room=room)
         emit('msg', {'message' : name + ' is summoning a ' + reg.group(0) + '!'}, room=room)
     else:
         emit('msg', {'message' : name + ': ' + message['message']}, room=room)
@@ -72,12 +69,15 @@ def user_msg(message):
 #User chat-name. Sets new name. Sends message regarding change to js function
 @socketio.on('change_name')
 def change_name(new):
+    #if name > 10 char
+    if (len(new['new']) > 10):
+        emit('diffname', {'name':new['new']})
     #if user has a name already
-    if ('name' in session):
+    elif ('name' in session):
         #no user repeats
         if (new['new'] in cursors.keys()):
             emit('msg', {'online' : ctr}, room=room)
-            emit('diffname', {'name':session['name']})            
+            emit('diffname', {'name':new['new']})            
         else:
             old = session['name']
             coord = cursors[old]
