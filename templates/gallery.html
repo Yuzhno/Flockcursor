@@ -1,1 +1,24 @@
 {%extends 'base.html'%}
+{%block body%}
+<script type="text/javascript" charset="utf-8">
+  $(document).ready(function() {
+  if(typeof(Storage)!=="undefined")
+  {
+  imgli = (JSON.parse(localStorage.getItem('images')));
+  }
+  for ( i in imgli ) {
+  var list = document.createElement('li');
+  var img = document.createElement('img');
+  console.log(imgli[i]);
+  list.innerHTML=i+"<br>"+"<img src='"+imgli[i]+"' width='35%' height='35%'/>";
+  $('#gallery').append(list);
+  }
+  });
+</script>
+<body>
+  <center>
+    <ul id='gallery'>
+    </ul>
+  </center>
+</body>
+{%endblock body%}
