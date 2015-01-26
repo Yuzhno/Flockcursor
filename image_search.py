@@ -1,9 +1,7 @@
-import json
-import urllib2
-import random
+import json, urllib2, random
 
 def get_google_search(query):
-    return json.loads(urllib2.urlopen('https://ajax.googleapis.com/ajax/services/search/images?v=1.0&q=' + query).read())
+    return json.loads(urllib2.urlopen('http://ajax.googleapis.com/ajax/services/search/images?v=1.0&q=' + query).read())
 
 def get_random_url(output):
     results = output['responseData']['results']

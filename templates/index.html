@@ -110,6 +110,7 @@ $(document).ready(function() {
     
     var cursors = new Object(); 
     var images = new Object(); 
+    var screens = {};
 
     var canvas = new fabric.Canvas('main-area');
    // var image_canvas = new fabric.Canvas('main-area');
@@ -123,7 +124,13 @@ $(document).ready(function() {
     /*user gets a chat name. triggers 'joined' python function*/
     socket.on('connect', function() {
 	var input = sanitize(prompt("Enter your nickname!", ""));
-	console.log(cursors)
+	d = new Date();
+	d1 = new Date();
+	var img = canvas.toDataURL(d.toUTCString()+"/png");
+	var img2 = canvas.toDataURL(d1.toUTCString()+"/png")
+	screen['img1'] = ('<img src="'+img+'"/>');
+/*	console.log('<img src="'+img2+'"/>');
+	console.log(screen['img1']);*/
 	socket.emit('joined', {name : input});
     });
 
@@ -236,6 +243,7 @@ $(document).ready(function() {
 	img.scale(1.0).set({
 	left: 10,
 	top : 10 });
+	canvas.add(img);
 	canvas.renderAll();
 	});
 	});
