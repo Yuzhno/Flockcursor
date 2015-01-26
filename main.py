@@ -15,6 +15,7 @@ app.config['SECRET_KEY'] = ':3'
 
 ctr = 0
 cursors = {}
+screenshots = {}
 
 @app.route('/')
 def interface():
@@ -117,6 +118,12 @@ def obj_move(coord):
 @socketio.on('top_layer')
 def top_layer(img):
     emit({'url' : img['name']}, room=room)
+
+@socketio.on('save')
+def save(scr):
+    for i in scr:
+        screenshots[i] = scr[i]
+    emit('post', screenshots)
 
 if __name__ == '__main__':
     socketio.run(app)
