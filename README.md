@@ -7,4 +7,6 @@ Making a drawing type thing with a chat on the side.
 Need flask-socketio
 
 ###Usage:
-!summon [image] to get an image
+Enter a username to do things
+Type !summon [image] in chat to get an image
+Can move images around and rotate
