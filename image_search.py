@@ -5,4 +5,6 @@ def get_google_search(query):
 
 def get_random_url(output):
     results = output['responseData']['results']
-    return results[random.randint(0, len(results) - 1)]['unescapedUrl']
+    if (results != []):
+        return results[random.randint(0, len(results) - 1)]['unescapedUrl']
+    return None

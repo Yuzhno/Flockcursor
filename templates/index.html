@@ -208,8 +208,7 @@ var selected = '';
 	if (code == 13) {
 	    text = sanitize($('#chat-prompt').val());
 	    $('#chat-prompt').val('')
-
-	    socket.emit('user_msg', {message: text});
+	    socket.emit('user_msg', {message: text, img_url: selected['name']});
 	}
     });
 
@@ -308,6 +307,29 @@ img['name'] = e.url;
 	    canvas.add(img);
 	    canvas.renderAll();
 	});
+    });
+
+    socket.on('render_all', function(e){
+	for(var key in e.images) {
+	fabric.Image.fromURL(key, function(img) {
+	    img.set({
+		left: e.images[key][1][0],
+		top : e.images[key][1][1],
+scaleX : e.images[key][0][0],
+scaleY : e.images[key][0][1],
+angle : e.images[key][2]
+	});
+img['name'] = key;
+	images[key] = img;
+	    canvas.add(img);
+	    canvas.renderAll();
+	});
+}
+    });
+
+    socket.on('delete_image', function(e){
+	canvas.remove(images[e.url]);
+	delete images[e.url];
     });
 
 	var screens = {};

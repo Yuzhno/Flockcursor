@@ -15,6 +15,7 @@ app.config['SECRET_KEY'] = ':3'
 
 ctr = 0
 cursors = {}
+images = {}
 screenshots = {}
 
 @app.route('/')
@@ -43,6 +44,7 @@ def joined(name):
             emit('msg', {'message' : name['name'] + " has joined!", 'online' : ctr}, room=room)
             emit('join')
             emit('draw_all', {'players' : cursors}, room=room)
+            emit('render_all', {'images' : images}, room=room)
     #else user can only see how many are on chat
     else:
         emit('msg', {'online' : ctr}, room=room)
@@ -62,12 +64,22 @@ def leave():
 #User chat-prompt. Sends message to js function -> prints message in chat
 @socketio.on('user_msg')
 def user_msg(message):
-    reg = re.search('(?<=^!summon )[\w ]+', message['message'])
+    reg_summon = re.search('(?<=^!summon )[\w ]+', message['message'])
+    reg_del = re.search('^!delete', message['message'])
     name = session['name']
-    if (reg != None):
-        fix = reg.group(0).replace(" ", "%20")
-        emit('render_image', {'url' : get_random_url(get_google_search(fix)), 'message' : message}, room=room)
-        emit('msg', {'message' : name + ' is summoning a ' + reg.group(0) + '!'}, room=room)
+    if (reg_summon != None):
+        fix = reg_summon.group(0).replace(" ", "%20")
+        got_url = get_random_url(get_google_search(fix))
+        if (got_url == None):
+            emit('msg', {'message' : name + ' tried to summon a ' + reg_summon.group(0) + ' but failed!'}, room=room)
+            return 1
+        images[got_url] = [[0.4, 0.4], [10, 10], 0]
+        emit('render_image', {'url' : got_url, 'message' : message}, room=room)
+        emit('msg', {'message' : name + ' is summoning a ' + reg_summon.group(0) + '!'}, room=room)
+    elif (reg_del != None and u'img_url' in message.keys()):
+        del(images[message['img_url']])
+        emit('delete_image', {'url' : message['img_url']}, room=room)
+        emit('msg', {'message' : name + ' has deleted ' + message['img_url'] + '!'}, room=room)
     else:
         emit('msg', {'message' : name + ': ' + message['message']}, room=room)
 
@@ -105,14 +117,17 @@ def mouse_move(coor):
 
 @socketio.on('obj_scale')
 def obj_scale(scale):
+    images[scale['name']][0] = [scale['x'], scale['y']]
     emit('other_obj_scale', {'x' : scale['x'], 'y' : scale['y'], 'url' : scale['name']}, room=room)
 
 @socketio.on('obj_rotate')
 def obj_rotate(angle):
+    images[angle['name']][2] = angle['angle']
     emit('other_obj_rotate', {'angle' : angle['angle'], 'url' : angle['name']}, room=room)
 
 @socketio.on('obj_move')
 def obj_move(coord):
+    images[coord['name']][1] = [coord['x'], coord['y']]
     emit('other_obj_move', {'x' : coord['x'], 'y' : coord['y'], 'url' : coord['name']}, room=room)
 
 @socketio.on('top_layer')
