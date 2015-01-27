@@ -110,8 +110,8 @@ var restrict = function(name) {
 }
 
 var remove_white = new fabric.Image.filters.RemoveWhite({
-    threshold: 20,
-    distance: 140
+    threshold: 30,
+    distance: 150
 });
 
 $(document).ready(function() {
@@ -241,12 +241,12 @@ $(document).ready(function() {
 
     canvas.on('object:selected', function(e) {
 	selected = canvas.getActiveObject();
-	//socket.emit('top_layer', {name : selected['name']});
+	socket.emit('top_layer', {name : selected['name']});
     });
 
-    //  socket.on('other_top_layer', function(e){
-    //	canvas.bringForward(images[e.url]);
-    //   });
+    socket.on('other_top_layer', function(e){
+    	canvas.bringToFront(images[e.url]);
+       });
 
     canvas.on('selection:cleared', function(e) {
 	selected = '';
@@ -295,10 +295,12 @@ $(document).ready(function() {
 	    img.scale(0.4).set({
 		left: 10,
 		top : 10 });
+//	img.filters.push(remove_white);
 	    img['name'] = e.url;
 	    images[e.url] = img;
 	    canvas.add(img);
-	    canvas.renderAll();
+	canvas.renderAll();
+	//   img.applyFilters(canvas.renderAll.bind(canvas));
 	});
     });
 
@@ -325,6 +327,11 @@ $(document).ready(function() {
     socket.on('delete_image', function(e){
 	canvas.remove(images[e.url]);
 	delete images[e.url];
+    });
+
+    socket.on('clear_all', function(e){
+	canvas.clear();
+	images = {};
     });
 
 

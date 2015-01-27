@@ -18,6 +18,8 @@ cursors = {}
 images = {}
 screenshots = {}
 
+clear = 0
+
 @app.route('/')
 def interface():
     return render_template('index.html', online=ctr)
@@ -62,6 +64,7 @@ def leave():
 def user_msg(message):
     reg_summon = re.search('(?<=^!summon )[\w ]+', message['message'])
     reg_del = re.search('^!delete', message['message'])
+    reg_clr = re.search('^!clear', message['message'])
     name = session['name']
     if (reg_summon != None):
         fix = reg_summon.group(0).replace(" ", "%20")
@@ -76,6 +79,18 @@ def user_msg(message):
         del(images[message['img_url']])
         emit('delete_image', {'url' : message['img_url']}, room=room)
         emit('msg', {'message' : name + ' has deleted ' + message['img_url'] + '!'}, room=room)
+    elif (reg_clr != None):
+        global clear
+        global ctr
+        clear += 1
+        if (clear >= (0.5 * ctr)):
+            global images
+            emit('clear_all', {}, room=room)
+            images = {}
+            emit('msg', {'message' : 'Canvas cleared!'}, room=room)
+            clear = 0
+        else:
+            emit('msg', {'message' : name + ' wants to clear the canvas. Type !clear to agree. ' + str(0.5 * ctr) + ' people needed.'}, room=room)
     else:
         emit('msg', {'message' : name + ': ' + message['message']}, room=room)
 
@@ -128,7 +143,7 @@ def obj_move(coord):
 
 @socketio.on('top_layer')
 def top_layer(img):
-    emit({'url' : img['name']}, room=room)
+    emit('other_top_layer', {'url' : img['name']}, room=room)
 
 #Broken gallery things
 @socketio.on('save')
@@ -137,7 +152,6 @@ def save(scr):
         print 'hi'
         screenshots[i] = scr[i]
         emit('post', screenshots)
-
 
 if __name__ == '__main__':
     socketio.run(app)

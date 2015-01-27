@@ -19,8 +19,8 @@ var restrict = function(name) {
 }
 
 var remove_white = new fabric.Image.filters.RemoveWhite({
-    threshold: 20,
-    distance: 140
+    threshold: 30,
+    distance: 150
 });
 
 $(document).ready(function() {
@@ -46,13 +46,6 @@ $(document).ready(function() {
 	    input = sanitize(prompt("Enter your nickname!", ""));
 	}
 	
-	d = new Date();
-	d1 = new Date();
-	var img = canvas.toDataURL(d.toUTCString()+"/png");
-	var img2 = canvas.toDataURL(d1.toUTCString()+"/png")
-	screen['img1'] = ('<img src="'+img+'"/>');
-	/*	console.log('<img src="'+img2+'"/>');
-		console.log(screen['img1']);*/
 	socket.emit('joined', {name : input});
     });
 
@@ -157,12 +150,12 @@ $(document).ready(function() {
 
     canvas.on('object:selected', function(e) {
 	selected = canvas.getActiveObject();
-	//socket.emit('top_layer', {name : selected['name']});
+	socket.emit('top_layer', {name : selected['name']});
     });
 
-    //  socket.on('other_top_layer', function(e){
-    //	canvas.bringForward(images[e.url]);
-    //   });
+    socket.on('other_top_layer', function(e){
+    	canvas.bringToFront(images[e.url]);
+       });
 
     canvas.on('selection:cleared', function(e) {
 	selected = '';
@@ -211,16 +204,18 @@ $(document).ready(function() {
 	    img.scale(0.4).set({
 		left: 10,
 		top : 10 });
+//	img.filters.push(remove_white);
 	    img['name'] = e.url;
 	    images[e.url] = img;
 	    canvas.add(img);
-	    canvas.renderAll();
+	canvas.renderAll();
+	//   img.applyFilters(canvas.renderAll.bind(canvas));
 	});
     });
 
     socket.on('render_all', function(e){
 	for(var key in e.images) {
-	    if (cursors[key] == undefined){
+	    if (images[key] == undefined){
 		fabric.Image.fromURL(key, function(img) {
 		    img.set({
 			left: e.images[key][1][0],
@@ -243,6 +238,13 @@ $(document).ready(function() {
 	delete images[e.url];
     });
 
+    socket.on('clear_all', function(e){
+	canvas.clear();
+	images = {};
+    });
+
+
+//Broken gallery things
     var screens = {};
 
     $('#save').click(function() {
@@ -250,7 +252,7 @@ $(document).ready(function() {
 	var img = new Image();
 	img.crossOrigin = 'Anonymous';
 	img.src = canvas.toDataURL(d.toUTCString()+"/png");
-	/*Screenshot dictionary, contains date and image url*/
+	/*Screenshot dictionary, contains date and image*/
 	screens[d] = img.src;
 	socket.emit("save", screens);
     });
@@ -258,7 +260,6 @@ $(document).ready(function() {
     socket.on('post', function(scr) {
 	if(typeof(Storage)!=="undefined"){
 	    localStorage.setItem('images',JSON.stringify(scr));
-	    console.log(scr);
 	}
     });
 });
