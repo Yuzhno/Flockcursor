@@ -89,6 +89,7 @@ def user_msg(message):
             images = {}
             emit('msg', {'message' : 'Canvas cleared!'}, room=room)
             clear = 0
+            emit('draw_all', {'players' : cursors}, room=room)
         else:
             emit('msg', {'message' : name + ' wants to clear the canvas. Type !clear to agree. ' + str(0.5 * ctr) + ' people needed.'}, room=room)
     else:
