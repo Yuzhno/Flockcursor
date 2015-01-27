@@ -6,5 +6,5 @@ Making a drawing type thing with a chat on the side.
 
 Need flask-socketio
 
-#Usage:
+###Usage:
 !summon [image] to get an image
