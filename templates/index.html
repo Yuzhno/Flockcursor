@@ -137,13 +137,6 @@ $(document).ready(function() {
 	    input = sanitize(prompt("Enter your nickname!", ""));
 	}
 	
-	d = new Date();
-	d1 = new Date();
-	var img = canvas.toDataURL(d.toUTCString()+"/png");
-	var img2 = canvas.toDataURL(d1.toUTCString()+"/png")
-	screen['img1'] = ('<img src="'+img+'"/>');
-	/*	console.log('<img src="'+img2+'"/>');
-		console.log(screen['img1']);*/
 	socket.emit('joined', {name : input});
     });
 
@@ -341,8 +334,9 @@ $(document).ready(function() {
 	var img = new Image();
 	img.crossOrigin = 'Anonymous';
 	img.src = canvas.toDataURL(d.toUTCString()+"/png");
-	/*Screenshot dictionary, contains date and image url*/
-	screens[d] = img.src;
+//	var c = JSON.stringify(canvas);
+	/*Screenshot dictionary, contains date and image*/
+	screens[d] = c;
 	socket.emit("save", screens);
     });
     
