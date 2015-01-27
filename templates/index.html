@@ -29,7 +29,7 @@ p {
 .content-main {
 	position: fixed;
 	width: 80%;
-	height: 95%;
+	height: 100%;
 	overflow: scroll;
 }
 
@@ -327,6 +327,8 @@ $(document).ready(function() {
 	delete images[e.url];
     });
 
+
+//Broken gallery things
     var screens = {};
 
     $('#save').click(function() {
@@ -334,16 +336,14 @@ $(document).ready(function() {
 	var img = new Image();
 	img.crossOrigin = 'Anonymous';
 	img.src = canvas.toDataURL(d.toUTCString()+"/png");
-//	var c = JSON.stringify(canvas);
 	/*Screenshot dictionary, contains date and image*/
-	screens[d] = c;
+	screens[d] = img.src;
 	socket.emit("save", screens);
     });
     
     socket.on('post', function(scr) {
 	if(typeof(Storage)!=="undefined"){
 	    localStorage.setItem('images',JSON.stringify(scr));
-	    console.log(scr);
 	}
     });
 });
@@ -360,10 +360,11 @@ $(document).ready(function() {
       <textarea id="chat-prompt" placeholder="send a message" disabled="true"></textarea>
       <input id="name" name="nick" placeholder="enter your nick here">
       <div id="online"></div>
-      <center>
+<!--      <center>
 	<br>
 	<button id='save' type='button'>Save Image</button>
       </center>
+-->
     </div>
   </div>
 

@@ -22,10 +22,6 @@ screenshots = {}
 def interface():
     return render_template('index.html', online=ctr)
 
-@app.route('/gallery')
-def gallery():
-    return render_template('gallery.html')
-
 #user connects to page. announces user joining in chat
 @socketio.on('joined')
 def joined(name):
@@ -134,11 +130,14 @@ def obj_move(coord):
 def top_layer(img):
     emit({'url' : img['name']}, room=room)
 
+#Broken gallery things
 @socketio.on('save')
 def save(scr):
     for i in scr:
+        print 'hi'
         screenshots[i] = scr[i]
         emit('post', screenshots)
+
 
 if __name__ == '__main__':
     socketio.run(app)
