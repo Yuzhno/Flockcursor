@@ -1,10 +1,11 @@
 Flockcollage
 =========================
-http://flock.yuugu.re:8080/
+######Site: http://flock.yuugu.re:8080/
+######Video: https://www.youtube.com/watch?v=N1YGEAo3yEo
 
 Allow users to summon images and move them around on the same canvas using websockets for multiple mouses. There is chat on the side with multiple commands to manipulate the canvas.
 
-Need flask-socketio
+Need to pip install flask-socketio
 
 ###Usage:
   * Enter a username to do things
