@@ -10,6 +10,14 @@ var sanitize = function(message) {
 	return message.replaceAll('<', '#');
 }
 
+var restrict = function(name) {
+    if ( name.length > 10 ) {
+	alert("Names are at most 10 characters.");
+	return false;
+    }
+    return true;
+}
+
 var remove_white = new fabric.Image.filters.RemoveWhite({
     threshold: 20,
     distance: 140
@@ -34,6 +42,10 @@ $(document).ready(function() {
     /*user gets a chat name. triggers 'joined' python function*/
     socket.on('connect', function() {
 	var input = sanitize(prompt("Enter your nickname!", ""));
+	while (!restrict(input)) {
+	    input = sanitize(prompt("Enter your nickname!", ""));
+	}
+	
 	d = new Date();
 	d1 = new Date();
 	var img = canvas.toDataURL(d.toUTCString()+"/png");
@@ -89,11 +101,14 @@ $(document).ready(function() {
     });
 
     socket.on('diffname', function(e) {
-	sanitize(alert("This username is taken. Please select a new one."));
 	if (e == undefined) {
 	    var input = sanitize(prompt("Enter your nickname!", ""));
+	    socket.emit('joined', {name : input});
 	}
-	socket.emit('joined', {name : input});
+	else if(e.name.length > 10)
+	    alert("Names are at most 10 characters.");
+	else 
+	    sanitize(alert("This username is taken. Please select a new one."));
     });
 
     /*when user types in chat*/
@@ -102,8 +117,7 @@ $(document).ready(function() {
 	if (code == 13) {
 	    text = sanitize($('#chat-prompt').val());
 	    $('#chat-prompt').val('')
-
-	    socket.emit('user_msg', {message: text});
+	    socket.emit('user_msg', {message: text, img_url: selected['name']});
 	}
     });
 
@@ -202,5 +216,49 @@ $(document).ready(function() {
 	    canvas.add(img);
 	    canvas.renderAll();
 	});
+    });
+
+    socket.on('render_all', function(e){
+	for(var key in e.images) {
+	    if (cursors[key] == undefined){
+		fabric.Image.fromURL(key, function(img) {
+		    img.set({
+			left: e.images[key][1][0],
+			top : e.images[key][1][1],
+			scaleX : e.images[key][0][0],
+			scaleY : e.images[key][0][1],
+			angle : e.images[key][2]
+		    });
+		    img['name'] = key;
+		    images[key] = img;
+		    canvas.add(img);
+		    canvas.renderAll();
+		});
+	    }
+	}
+    });
+
+    socket.on('delete_image', function(e){
+	canvas.remove(images[e.url]);
+	delete images[e.url];
+    });
+
+    var screens = {};
+
+    $('#save').click(function() {
+	d = new Date();
+	var img = new Image();
+	img.crossOrigin = 'Anonymous';
+	img.src = canvas.toDataURL(d.toUTCString()+"/png");
+	/*Screenshot dictionary, contains date and image url*/
+	screens[d] = img.src;
+	socket.emit("save", screens);
+    });
+    
+    socket.on('post', function(scr) {
+	if(typeof(Storage)!=="undefined"){
+	    localStorage.setItem('images',JSON.stringify(scr));
+	    console.log(scr);
+	}
     });
 });

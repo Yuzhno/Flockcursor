@@ -102,13 +102,13 @@ var sanitize = function(message) {
 }
 
 var restrict = function(name) {
-	if ( name.length > 10 ) {
+    if ( name.length > 10 ) {
 	alert("Names are at most 10 characters.");
 	return false;
-	}
-	return true;
+    }
+    return true;
 }
-				       
+
 var remove_white = new fabric.Image.filters.RemoveWhite({
     threshold: 20,
     distance: 140
@@ -118,7 +118,7 @@ $(document).ready(function() {
     
     var cursors = new Object(); 
     var images = new Object(); 
-var selected = '';
+    var selected = '';
     var screens = {};
 
     var canvas = new fabric.Canvas('main-area');
@@ -240,7 +240,7 @@ var selected = '';
     var mouse_last_move = 0;
     canvas.on('mouse:move', function(e) {
 	if(Date.now() - mouse_last_move > 25){
-	var pointer = canvas.getPointer(e.e);
+	    var pointer = canvas.getPointer(e.e);
 	    socket.emit('mouse_move', {top : pointer.x, left : pointer.y});
 	    mouse_last_move = Date.now();
 	}
@@ -248,47 +248,47 @@ var selected = '';
 
     canvas.on('object:selected', function(e) {
 	selected = canvas.getActiveObject();
-//socket.emit('top_layer', {name : selected['name']});
+	//socket.emit('top_layer', {name : selected['name']});
     });
 
-  //  socket.on('other_top_layer', function(e){
-//	canvas.bringForward(images[e.url]);
- //   });
+    //  socket.on('other_top_layer', function(e){
+    //	canvas.bringForward(images[e.url]);
+    //   });
 
     canvas.on('selection:cleared', function(e) {
 	selected = '';
     });
 
     canvas.on('object:moving', function(e) {
-socket.emit('obj_move', {x : selected.getLeft(), y : selected.getTop(), name : selected['name']});
+	socket.emit('obj_move', {x : selected.getLeft(), y : selected.getTop(), name : selected['name']});
     });
 
     socket.on('other_obj_move', function(e){
 	if(e.url != selected['name']) {
-	images[e.url].setLeft(e.x);
-	images[e.url].setTop(e.y);
-}
+	    images[e.url].setLeft(e.x);
+	    images[e.url].setTop(e.y);
+	}
     });
 
     canvas.on('object:scaling', function(e) {
-socket.emit('obj_scale', {x : selected.getScaleX(), y : selected.getScaleY(), name : selected['name']});
+	socket.emit('obj_scale', {x : selected.getScaleX(), y : selected.getScaleY(), name : selected['name']});
     });
 
     socket.on('other_obj_scale', function(e){
 	if(e.url != selected['name']) {
-	images[e.url].setScaleX(e.x);
-	images[e.url].setScaleY(e.y);
-}
+	    images[e.url].setScaleX(e.x);
+	    images[e.url].setScaleY(e.y);
+	}
     });
 
     canvas.on('object:rotating', function(e) {
-socket.emit('obj_rotate', {angle : selected.getAngle(), name : selected['name']});
+	socket.emit('obj_rotate', {angle : selected.getAngle(), name : selected['name']});
     });
 
     socket.on('other_obj_rotate', function(e){
 	if(e.url != selected['name']) {
-	images[e.url].setAngle(e.angle);
-}
+	    images[e.url].setAngle(e.angle);
+	}
     });
 
     socket.on('move_clientmouse', function(e){
@@ -302,8 +302,8 @@ socket.emit('obj_rotate', {angle : selected.getAngle(), name : selected['name']}
 	    img.scale(0.4).set({
 		left: 10,
 		top : 10 });
-img['name'] = e.url;
-	images[e.url] = img;
+	    img['name'] = e.url;
+	    images[e.url] = img;
 	    canvas.add(img);
 	    canvas.renderAll();
 	});
@@ -311,20 +311,22 @@ img['name'] = e.url;
 
     socket.on('render_all', function(e){
 	for(var key in e.images) {
-	fabric.Image.fromURL(key, function(img) {
-	    img.set({
-		left: e.images[key][1][0],
-		top : e.images[key][1][1],
-scaleX : e.images[key][0][0],
-scaleY : e.images[key][0][1],
-angle : e.images[key][2]
-	});
-img['name'] = key;
-	images[key] = img;
-	    canvas.add(img);
-	    canvas.renderAll();
-	});
-}
+	    if (images[key] == undefined){
+		fabric.Image.fromURL(key, function(img) {
+		    img.set({
+			left: e.images[key][1][0],
+			top : e.images[key][1][1],
+			scaleX : e.images[key][0][0],
+			scaleY : e.images[key][0][1],
+			angle : e.images[key][2]
+		    });
+		    img['name'] = key;
+		    images[key] = img;
+		    canvas.add(img);
+		    canvas.renderAll();
+		});
+	    }
+	}
     });
 
     socket.on('delete_image', function(e){
@@ -332,9 +334,9 @@ img['name'] = key;
 	delete images[e.url];
     });
 
-	var screens = {};
+    var screens = {};
 
-	$('#save').click(function() {
+    $('#save').click(function() {
 	d = new Date();
 	var img = new Image();
 	img.crossOrigin = 'Anonymous';
@@ -342,15 +344,16 @@ img['name'] = key;
 	/*Screenshot dictionary, contains date and image url*/
 	screens[d] = img.src;
 	socket.emit("save", screens);
-	});
-	
-	socket.on('post', function(scr) {
+    });
+    
+    socket.on('post', function(scr) {
 	if(typeof(Storage)!=="undefined"){
-	localStorage.setItem('images',JSON.stringify(scr));
-	console.log(scr);
+	    localStorage.setItem('images',JSON.stringify(scr));
+	    console.log(scr);
 	}
-	});
+    });
 });
+
 
   </script>
 {%endblock script%}
